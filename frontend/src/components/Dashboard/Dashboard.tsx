@@ -89,7 +89,7 @@ export default function Dashboard() {
         const host =
           process.env.NODE_ENV === 'production'
             ? window.location.host
-            : '192.168.2.16:8000'
+            : 'localhost:8000'
 
         const wsProtocol =
           window.location.protocol === 'https:' ? 'wss:' : 'ws:'
