@@ -3,9 +3,9 @@ name: Publish Docker images to GHCR
 on:
   push:
     branches:
-      - 'main' # Trigger on pushes to the main branch
+      - 'main'       # Trigger on pushes to the main branch
     tags:
-      - 'v*.*.*' # Trigger on tags like v1.0.0
+      - 'v*.*.*'     # Trigger on tags like v1.0.0
 
 env:
   REGISTRY: ghcr.io
@@ -30,18 +30,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Docker tags
-        id: meta
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ---------- BACKEND ----------
+      - name: Extract metadata for backend image
+        id: meta-backend
         uses: docker/metadata-action@v5
         with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-backend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-frontend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-nginx
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-backend
           tags: |
             # tag latest for main branch
             type=raw,value=latest,enable={{is_default_branch}}
-            # tag with version for git tags
+            # tag with version for git tags (v1.0.0 etc.)
             type=ref,event=tag
 
       - name: Build and push backend image
@@ -49,21 +50,41 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-backend:${{ steps.meta.outputs.version }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+      # ---------- FRONTEND ----------
+      - name: Extract metadata for frontend image
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-frontend
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-frontend:${{ steps.meta.outputs.version }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+
+      # ---------- NGINX ----------
+      - name: Extract metadata for nginx image
+        id: meta-nginx
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-nginx
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
 
       - name: Build and push nginx image
         uses: docker/build-push-action@v5
         with:
           context: ./nginx
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-nginx:${{ steps.meta.outputs.version }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-nginx.outputs.tags }}
+          labels: ${{ steps.meta-nginx.outputs.labels }}
