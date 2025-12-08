@@ -5,3 +5,4 @@ Stack: Next.js - Django - Tailwind - ShadCN
 Work In Progress
 
 ![](image.png)
+![](image2.png)
