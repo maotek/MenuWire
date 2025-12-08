@@ -1,19 +1,28 @@
-import OrderNavbar from '@/components/Order/OrderNavbar';
 import DishBrowser from '@/components/Order/DishBrowser';
 import { getTranslations } from 'next-intl/server';
 import { fetchCategories } from '@/data/mockData';
 import { DishCategory, Dish } from '@/app/lib/types';
 
-/** --- Openverse resolver (inline) --- */
+/**
+ * An item from the Openverse API response.
+ */
 type OpenverseItem = { url?: string; thumbnail?: string };
+
+/**
+ * Fetches an image URL from the Openverse API.
+ * If the provided URL is not for Openverse, it's returned directly.
+ * This allows using both direct image links and Openverse search results.
+ * @param apiUrl The URL to resolve, which can be a direct image link or an Openverse API link.
+ * @returns A direct URL to an image, or null if resolution fails.
+ */
 async function resolveOpenverseImage(apiUrl: string): Promise<string | null> {
   try {
     const u = new URL(apiUrl);
-    // If it's already a direct image URL, just return it
+    // If it's already a direct image URL, just return it.
     if (u.hostname !== 'api.openverse.org') return apiUrl;
 
     const res = await fetch(apiUrl, {
-      // Cache for 1 day so we don’t hammer Openverse
+      // Cache for 1 day so we don’t hammer the Openverse API.
       next: { revalidate: 60 * 60 * 24 },
       headers: { 'User-Agent': 'menuwire/1.0 (+https://example.com)' },
     });
@@ -21,14 +30,18 @@ async function resolveOpenverseImage(apiUrl: string): Promise<string | null> {
 
     const data = await res.json();
     const first: OpenverseItem | undefined = data?.results?.[0];
-    // Prefer smaller thumbnail for cards; fall back to original url
+    // Prefer the smaller thumbnail for performance; fall back to the full-size URL.
     return first?.thumbnail || first?.url || null;
   } catch {
     return null;
   }
 }
 
-/** --- Tiny concurrency limiter (inline) --- */
+/**
+ * A simple promise-based concurrency limiter.
+ * This prevents sending too many network requests at once when fetching images.
+ * @param n The maximum number of concurrent promises.
+ */
 function pLimit(n: number) {
   const queue: Array<() => void> = [];
   let active = 0;
@@ -47,10 +60,13 @@ function pLimit(n: number) {
   };
 }
 
-/** --- Fetch + resolve in one go (inline) --- */
+/**
+ * Fetches the dish categories and resolves all dish images from Openverse.
+ * It uses a concurrency limiter to be polite to the external API.
+ */
 async function fetchCategoriesResolved(): Promise<DishCategory[]> {
   const categories = await fetchCategories();
-  const limit = pLimit(8); // be polite
+  const limit = pLimit(8); // Limit to 8 concurrent image requests.
 
   const resolved = await Promise.all(
     categories.map(async (cat) => {
@@ -60,7 +76,7 @@ async function fetchCategoriesResolved(): Promise<DishCategory[]> {
             const real = await resolveOpenverseImage(dish.image);
             return {
               ...dish,
-              image: real ?? '/assets/logo.png', // fallback asset you ship
+              image: real ?? '/assets/logo.png', // Use a local fallback image if resolution fails.
             };
           })
         )
@@ -72,13 +88,19 @@ async function fetchCategoriesResolved(): Promise<DishCategory[]> {
   return resolved;
 }
 
-/** --- Next.js metadata --- */
+/**
+ * Sets the page title using translated content.
+ * This is a standard Next.js metadata function.
+ */
 export async function generateMetadata() {
   const t = await getTranslations('Order');
   return { title: t('browserTitle') };
 }
 
-/** --- Page component --- */
+/**
+ * The main server component for the order demo page.
+ * It fetches all necessary data and handles rendering of the DishBrowser.
+ */
 export default async function Page() {
   try {
     const dishData = await fetchCategoriesResolved();

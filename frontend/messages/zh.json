@@ -9,7 +9,10 @@
     "added": "已加入!",
     "basketEmpty": "您的购物篮是空的",
     "totalPrice": "总价:",
-    "orderNow": "立即下单"
+    "orderNow": "立即下单",
+    "ordering": "正在下单...",
+    "orderSuccess": "下单成功 (#{id}) — 总计 €{total}",
+    "orderFailed": "下单失败: {message}"
   },
   "locales": {
     "zh": "简体中文",

@@ -113,15 +113,25 @@ class CreateOrderAPIView(APIView):
         # Resolve dishes and ensure they all belong to the same restaurant
         first_rest = None
         items_to_create = []
+        order_subtotal = 0
         try:
+            # Collect all option IDs from the payload to fetch them in a single query
+            all_option_ids = [
+                int(oid)
+                for entry in payload
+                for o in entry.get("options", [])
+                if (oid := (o.get("id") if isinstance(o, dict) else o))
+            ]
+            # Fetch all relevant options at once
+            options_qs = Option.objects.filter(id__in=all_option_ids)
+            options_map = {opt.id: opt for opt in options_qs}
+
             for entry in payload:
                 dish_entry = entry.get("dish") if isinstance(entry, dict) else entry
-                if isinstance(dish_entry, dict):
-                    dish_id = dish_entry.get("id")
-                else:
-                    dish_id = dish_entry
+                dish_id = dish_entry.get("id") if isinstance(dish_entry, dict) else dish_entry
                 if not dish_id:
                     raise ValueError("Each item must include a dish id")
+
                 dish = Dish.objects.select_related("category__restaurant").get(id=dish_id)
                 rest = dish.category.restaurant
                 if first_rest is None:
@@ -129,28 +139,46 @@ class CreateOrderAPIView(APIView):
                 elif first_rest.pk != rest.pk:
                     raise ValueError("All dishes in an order must belong to the same restaurant")
 
-                quantity = int(entry.get("quantity", 1)) if isinstance(entry, dict) else 1
+                quantity = int(entry.get("quantity", 1))
+                line_total = dish.price * quantity
 
-                # parse option ids
-                opt_ids = []
-                opts = entry.get("options", []) if isinstance(entry, dict) else []
-                for o in opts:
-                    if isinstance(o, dict):
-                        oid = o.get("id")
-                    else:
-                        oid = o
-                    if oid:
-                        opt_ids.append(int(oid))
+                # Process options for this item
+                item_options_snapshot = []
+                opt_ids = [
+                    int(oid)
+                    for o in entry.get("options", [])
+                    if (oid := (o.get("id") if isinstance(o, dict) else o))
+                ]
 
-                items_to_create.append({"dish": dish, "quantity": quantity, "option_ids": opt_ids})
+                for opt_id in opt_ids:
+                    option = options_map.get(opt_id)
+                    if not option or option.restaurant_id != first_rest.id:
+                        raise ValueError(f"Option ID {opt_id} is invalid or does not belong to this restaurant.")
+                    
+                    # Add option price to the line total
+                    line_total += option.price * quantity
+                    
+                    # Add option details to the snapshot
+                    item_options_snapshot.append({
+                        "id": option.id,
+                        "name": option.name,
+                        "price": str(option.price) # Use string for Decimal serialization
+                    })
+
+                order_subtotal += line_total
+                items_to_create.append({
+                    "dish": dish,
+                    "quantity": quantity,
+                    "options_snapshot": item_options_snapshot
+                })
         except Dish.DoesNotExist:
             return Response({"detail": "One or more dishes not found"}, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError as e:
+        except (ValueError, TypeError) as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create order and items in a transaction
         with transaction.atomic():
-            # If a table code was provided, resolve it (and ensure it belongs to the same restaurant)
+            # If a table code was provided, resolve it
             table_obj = None
             if table_code:
                 try:
@@ -158,26 +186,26 @@ class CreateOrderAPIView(APIView):
                 except Table.DoesNotExist:
                     return Response({"detail": "Table not found for this restaurant."}, status=status.HTTP_400_BAD_REQUEST)
 
-            order = Order.objects.create(restaurant=first_rest, table=table_obj, status=Order.STATUS_PLACED)
-            created_items = []
-            for entry in items_to_create:
-                dish = entry["dish"]
-                quantity = entry["quantity"]
-                unit_price = dish.price
-                oi = OrderItem.objects.create(
+            # Create the order with pre-calculated totals
+            order = Order.objects.create(
+                restaurant=first_rest,
+                table=table_obj,
+                status=Order.STATUS_PLACED,
+                subtotal=order_subtotal,
+                total=order_subtotal # Assuming total is same as subtotal for now
+            )
+
+            # Create order items
+            for item_data in items_to_create:
+                dish = item_data["dish"]
+                OrderItem.objects.create(
                     order=order,
                     dish=dish,
+                    quantity=item_data["quantity"],
+                    options=item_data["options_snapshot"],
                     name=dish.name,
-                    quantity=quantity,
-                    unit_price=unit_price,
+                    unit_price=dish.price,
                 )
-                if entry["option_ids"]:
-                    options_qs = Option.objects.filter(id__in=entry["option_ids"], restaurant=first_rest)
-                    oi.options.add(*list(options_qs))
-                created_items.append(oi)
-
-            # recalc totals
-            order.recalc_totals()
 
         # Serialize the full order to send via WebSocket
         serializer = OrderSerializer(order)
@@ -265,7 +293,7 @@ class GetOrdersAPIView(APIView):
             )
 
         restaurant = user.restaurant
-        qs = Order.objects.filter(restaurant=restaurant).prefetch_related('items__options')
+        qs = Order.objects.filter(restaurant=restaurant).prefetch_related('items')
 
         serializer = OrderSerializer(qs, many=True)
 

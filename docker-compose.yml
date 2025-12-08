@@ -12,9 +12,6 @@ services:
   frontend:
     build:
       context: ./frontend
-      # args:
-        # BACKEND_TARGET: http://backend:8000
-      # Note that this was done because of optimized Next.js images, which sent request to nextjs server instead of nginx
     container_name: menuwire-frontend
     env_file:
       - ./.env
@@ -23,7 +20,7 @@ services:
     restart: unless-stopped
 
   nginx:
-    image: nginx:1.27-alpine
+    build: ./nginx
     container_name: menuwire-nginx
     depends_on:
       - backend

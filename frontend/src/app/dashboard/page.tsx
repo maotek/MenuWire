@@ -14,7 +14,6 @@ export async function generateMetadata() {
 
 
 export default async function Page() {
-  const t = await getTranslations('Dashboard');
   return (
     <>
       {/* <OrderNavbar name={t('title')} /> */}

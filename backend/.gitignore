@@ -12,3 +12,5 @@ uv.lock
 .venv
 
 .env
+
+/static

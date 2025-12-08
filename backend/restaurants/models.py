@@ -267,19 +267,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.pk} @ {_locale_display(self.restaurant.name)} ({self.status})"
 
-    def recalc_totals(self):
-        """Recalculate subtotal and total from order items and options."""
-        subtotal = 0
-        for item in self.items.all():
-            line = item.unit_price * item.quantity
-            # add prices for selected options on the item
-            opt_price = sum([o.price for o in item.options.all()])
-            line += opt_price * item.quantity
-            subtotal += line
-        self.subtotal = subtotal
-        self.total = subtotal  # placeholder: taxes/fees can be added here
-        self.save(update_fields=["subtotal", "total"])
-
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
@@ -288,7 +275,7 @@ class OrderItem(models.Model):
     name = models.JSONField(default=default_locales)
     quantity = models.PositiveIntegerField(default=1)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-    options = models.ManyToManyField(Option, blank=True, related_name="order_items")
+    options = models.JSONField(default=list, blank=True, help_text="Snapshot of options chosen at order time")
     notes = models.TextField(blank=True)
 
     class Meta:
@@ -296,13 +283,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{_locale_display(self.name)} x{self.quantity} (@ {self.unit_price})"
-
-    def save(self, *args, **kwargs):
-        # ensure name is populated from linked dish if not provided
-        if not self.name or (isinstance(self.name, dict) and not any(self.name.values())):
-            if self.dish:
-                self.name = self.dish.name
-        # ensure unit_price defaults to dish price if missing
-        if not self.unit_price and self.dish:
-            self.unit_price = self.dish.price
-        super().save(*args, **kwargs)

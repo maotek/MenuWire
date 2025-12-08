@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import type { RemotePattern } from 'next/dist/shared/lib/image-config';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+// This backend target is used for server-side requests from Next.js to the backend API and media files.
+// It should not be used in the frontend code, which uses relative paths and is served to the client.
 const BACKEND_TARGET = process.env.BACKEND_TARGET || "http://localhost:8000";
 
 console.log(`Using BACKEND_TARGET: ${BACKEND_TARGET}`);
@@ -34,6 +36,8 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   async rewrites() {
+    // In production, we send API and media requests to the the same domain.
+    // In development, we proxy them to the backend server.
     return [
       { source: '/api/:path*', destination: `${BACKEND_TARGET}/api/:path*/` },
       { source: '/media/:path*', destination: `${BACKEND_TARGET}/media/:path*` },

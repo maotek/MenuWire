@@ -9,7 +9,10 @@
     "added": "Added!",
     "basketEmpty": "Your basket is empty",
     "totalPrice": "Total price:",
-    "orderNow": "Order Now"
+    "orderNow": "Order Now",
+    "ordering": "Ordering...",
+    "orderSuccess": "Order placed (#{id}) — total €{total}",
+    "orderFailed": "Order failed: {message}"
   },
   "locales": {
     "zh": "简体中文",

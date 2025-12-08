@@ -9,7 +9,10 @@
     "added": "Toegevoegd!",
     "basketEmpty": "Je winkelmand is leeg",
     "totalPrice": "Totaalprijs:",
-    "orderNow": "Bestel Nu"
+    "orderNow": "Bestel Nu",
+    "ordering": "Bestellen...",
+    "orderSuccess": "Bestelling geplaatst (#{id}) — totaal €{total}",
+    "orderFailed": "Bestelling mislukt: {message}"
   },
   "locales": {
     "zh": "简体中文",

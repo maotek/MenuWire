@@ -44,11 +44,9 @@ class CategoryWithDishesSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    options = OptionSerializer(many=True, read_only=True)
-
     class Meta:
         model = OrderItem
-        fields = ["id", "name", "quantity", "options", "notes", "unit_price"]
+        fields = ["id", "name", "quantity", "unit_price", "options"]
 
 class TableSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -69,4 +67,4 @@ class OrderSerializer(serializers.Serializer):
 
     class Meta:
         model = Order
-        fields = ["id", "table", "items", "date"] # "status", "subtotal", "total",
+        fields = ["id", "table", "items", "date", "status"] # "status", "subtotal", "total",
