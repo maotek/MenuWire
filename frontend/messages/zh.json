@@ -64,7 +64,7 @@
     "markAsFinished": "标记为完成",
     "markAsPending": "标记为待处理",
     "connectingToServer": "正在连接到服务器...",
-    "reportIssue": "向管理员报告以下问题",
+    "reportIssue": "尝试刷新浏览器，或向管理员报告以下问题",
     "statusPlaced": "已下单",
     "statusFinished": "已完成",
     "statusCancelled": "已取消",

@@ -47,11 +47,7 @@ type EntityType = keyof typeof mockData
 
 const entityConfig = {
   dishes: { icon: Utensils, title: 'dishes', description: 'manageDishes' },
-  categories: {
-    icon: Bookmark,
-    title: 'categories',
-    description: 'manageCategories',
-  },
+  categories: { icon: Bookmark, title: 'categories', description: 'manageCategories'},
   tags: { icon: Tag, title: 'tags', description: 'manageTags' },
   options: { icon: ListPlus, title: 'options', description: 'manageOptions' },
 }
@@ -134,13 +130,15 @@ export default function Settings() {
       <h2 className="text-2xl font-bold text-center">{t('restaurantSettings')}</h2>
       <div className="flex flex-col md:flex-row gap-6">
         {/* Sidebar Navigation */}
-        <nav className="flex flex-row md:flex-col gap-2 md:w-1/5">
+        <nav className="flex flex-row md:flex-col gap-2 w-full md:w-1/5 overflow-auto">
           {Object.keys(mockData).map(key => (
-            <NavItem
-              key={key}
-              entity={key as EntityType}
-              icon={entityConfig[key as EntityType].icon}
-            />
+            <div key={key} className="max-w-max md:max-w-full">
+              <NavItem
+                key={key}
+                entity={key as EntityType}
+                icon={entityConfig[key as EntityType].icon}
+              />
+            </div>
           ))}
         </nav>
 

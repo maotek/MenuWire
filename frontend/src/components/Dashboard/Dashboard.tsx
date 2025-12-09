@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [initializing, setInitializing] = useState<boolean>(true)
   const [activeView, setActiveView] = useState<'orders' | 'settings'>('orders')
   const [orders, setOrders] = useState<Order[]>([])
-  const [ws, setWs] = useState<WebSocket | null>(null)
+  const ws = useRef<WebSocket | null>(null)
   const [wsStatus, setWsStatus] = useState<'online' | 'offline' | 'connecting'>('connecting')
   const reconnectAttempts = useRef(0)
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null)
@@ -66,8 +66,9 @@ export default function Dashboard() {
     })
   }, [orders])
 
+  
+
   const connect = useCallback(() => {
-    console.log('Running connect sequence...')
     const token = localStorage.getItem('access_token')
     if (!token) {
       console.error('No token found for WebSocket connection')
@@ -114,7 +115,7 @@ export default function Dashboard() {
 
     newWs.onclose = event => {
       console.log('WebSocket disconnected')
-      setWsStatus('offline')
+      setWsStatus('connecting')
       setError(prev => {
         const msg = `[${new Date().toLocaleTimeString()}] Connection closed: Code ${event.code}, Reason: ${event.reason || 'No reason given'}`
         return prev ? `${prev}\n${msg}` : msg
@@ -134,6 +135,10 @@ export default function Dashboard() {
         30000
       ) // 1s, 2s, 4s, ..., max 30s
       console.log(`Will attempt to reconnect in ${delay / 1000}s`)
+        setError(prev => {
+        const msg = `[${new Date().toLocaleTimeString()}] Reconnecting in ${delay / 1000}s...`
+        return prev ? `${prev}\n${msg}` : msg
+      })
       reconnectAttempts.current++
 
       if (reconnectTimeout.current) {
@@ -145,14 +150,14 @@ export default function Dashboard() {
     newWs.onerror = error => {
       console.error('WebSocket error')
       setError(prev => {
-        const msg = `[${new Date().toLocaleTimeString()}] WebSocket error occurred.`
+        const msg = `[${new Date().toLocaleTimeString()}] WebSocket error occurred: ${JSON.stringify(error)}`
         return prev ? `${prev}\n${msg}` : msg
       })
       newWs.close() // This will trigger onclose and the reconnect logic
     }
 
-    setWs(newWs)
-  }, [])
+    ws.current = newWs
+  }, [setUser, setWsStatus, setError])
 
   // Restore session via JWT on mount
   useEffect(() => {
@@ -186,16 +191,16 @@ export default function Dashboard() {
       if (reconnectTimeout.current) {
         clearTimeout(reconnectTimeout.current)
       }
-      if (ws) {
+      if (ws.current) {
         console.log('Closing WebSocket connection due to component unmount/user change.')
         // Prevent onclose from triggering reconnect
-        ws.onclose = null
-        ws.close()
-        setWs(null)
+        ws.current.onclose = null
+        ws.current.close()
+        ws.current = null
         setWsStatus('offline')
       }
     }
-  }, [user])
+  }, [user, connect])
 
   const handleLogoutClick = () => {
     logout();
@@ -206,8 +211,8 @@ export default function Dashboard() {
     orderId: number,
     newStatus: Order['status']
   ) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(
         JSON.stringify({
           type: 'update_order_status',
           order_id: orderId,
@@ -228,9 +233,7 @@ export default function Dashboard() {
   }
 
   if (user) {
-    const restaurantName =
-      user.restaurant_name[locale as keyof StringItem] ||
-      user.restaurant_name.en
+    const restaurantName = user.restaurant_name[locale as keyof StringItem] || user.restaurant_name.en
 
     return (
       <div className="min-h-screen w-full bg-body-1">
@@ -250,7 +253,7 @@ export default function Dashboard() {
             {error && (
               <>
                 <p className="mt-4 text-sm">{t('reportIssue')}:</p>
-                <pre className="text-xs text-red-400 mt-2 p-2 bg-black/20 rounded w-full max-w-2xl h-32 overflow-y-auto whitespace-pre-wrap">
+                <pre className="text-xs text-red-400 px-2 bg-black/20 rounded mx-2 max-w-2xl h-1/2 overflow-y-auto whitespace-pre-wrap">
                   {error}
                 </pre>
               </>

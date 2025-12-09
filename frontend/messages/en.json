@@ -63,7 +63,7 @@
     "addOption": "Add Option",
     "markAsFinished": "Mark as Finished",
     "connectingToServer": "Connecting to server...",
-    "reportIssue": "Report the following issue to the administrator",
+    "reportIssue": "Try to refresh the browser, or report the following issue to the administrator",
     "statusPlaced": "Placed",
     "statusFinished": "Finished",
     "statusCancelled": "Cancelled",
