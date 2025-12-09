@@ -1,11 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Menu, X, ShoppingCart, Settings } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Options } from '../Order/Options'
 import { locales } from '@/i18n/config'
+
+// Custom hook to detect clicks outside a referenced element
+function useOutsideClick(ref: React.RefObject<HTMLDivElement | null>, callback: () => void) {
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref?.current && !ref.current.contains(event.target as Node)) {
+        callback()
+      }
+    }
+    // Bind the event listener
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [ref, callback])
+}
 
 type WsStatus = 'online' | 'offline' | 'connecting'
 
@@ -33,29 +50,37 @@ const StatusIndicator = ({ status }: { status: WsStatus }) => {
 }
 
 export default function DashboardNavbar({
-    activeView,
-    onSelectView,
-    onLogout,
-    userName,
-    restaurantName,
-    wsStatus,
+  activeView,
+  onSelectView,
+  onLogout,
+  userName,
+  restaurantName,
+  wsStatus,
 }: DashboardNavbarProps) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const t = useTranslations('Dashboard')
-    const auth_t = useTranslations('Auth')
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const t = useTranslations('Dashboard')
+  const auth_t = useTranslations('Auth')
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
-    const navItems = [
-        {
-            view: 'orders',
-            label: t('incomingOrders'),
-            icon: ShoppingCart,
-        },
-        {
-            view: 'settings',
-            label: t('restaurantSettings'),
-            icon: Settings,
-        },
-    ] as const
+  // Close the menu when clicking outside of it
+  useOutsideClick(mobileMenuRef, () => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false)
+    }
+  })
+
+  const navItems = [
+    {
+      view: 'orders',
+      label: t('incomingOrders'),
+      icon: ShoppingCart,
+    },
+    {
+      view: 'settings',
+      label: t('restaurantSettings'),
+      icon: Settings,
+    },
+  ] as const
 
     const NavLink = ({
         view,
@@ -80,7 +105,8 @@ export default function DashboardNavbar({
     )
 
     return (
-        <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[rgb(var(--border-1))] bg-background px-4 sm:px-4 bg-body-1">
+        <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[rgb(var(--border-1))] bg-background px-4 sm:px-4 bg-body-1"
+            ref={mobileMenuRef}>
             {/* Left side: Hamburger and Restaurant Name */}
             <div className="flex items-center gap-4">
                 <Button
@@ -104,7 +130,6 @@ export default function DashboardNavbar({
             <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">
                     {userName}
-                    {/* {auth_t('welcomeBack', { name: userName })} */}
                 </span>
                 <StatusIndicator status={wsStatus} />
                 <div className="hidden lg:flex items-center gap-2">
@@ -117,7 +142,8 @@ export default function DashboardNavbar({
 
             {/* Mobile Menu */}
             <div
-                className={`absolute z-10 w-max top-14 left-0 right-0 border-b border-r rounded-br-md border-[rgb(var(--border-1))] bg-body-1 shadow-lg lg:hidden transition-all duration-300 ease-in-out ${isMenuOpen
+                className={`absolute z-10 w-max top-14 left-0 right-0 border-b border-r rounded-br-md border-[rgb(var(--border-1))] bg-body-1 shadow-lg lg:hidden transition-all duration-300 ease-in-out ${
+                  isMenuOpen
                     ? 'translate-x-0 opacity-100'
                     : '-translate-x-full opacity-0'
                 }`}

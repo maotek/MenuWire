@@ -95,7 +95,6 @@ export default function Dashboard() {
       setWsStatus('online')
       setError('') // Clear errors on successful connection
       reconnectAttempts.current = 0 // Reset attempts on successful connection
-      getOrders().then(setOrders).catch(console.error)
     }
 
     newWs.onmessage = event => {
@@ -184,6 +183,7 @@ export default function Dashboard() {
     if (user) {
       console.log('User is logged in, establishing WebSocket connection...')
       connect()
+      getOrders().then(setOrders).catch(console.error)
     }
 
     // Cleanup function: This will be called when the user logs out (and user becomes null) or when the component is unmounted.

@@ -14,11 +14,14 @@ class OrderConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
+
+            print(f"WebSocket connected for restaurant {self.restaurant_id}")
             await self.accept()
         else:
             await self.close()
 
     async def disconnect(self, close_code):
+        print(f"WebSocket disconnected for restaurant {getattr(self, 'restaurant_id', 'unknown')} with code {close_code}")
         if hasattr(self, 'room_group_name'):
             await self.channel_layer.group_discard(
                 self.room_group_name,
