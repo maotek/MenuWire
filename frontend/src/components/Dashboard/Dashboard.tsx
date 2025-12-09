@@ -68,99 +68,90 @@ export default function Dashboard() {
 
   const connect = useCallback(() => {
     console.log('Running connect sequence...')
-    initAuth()
-      .then(authedUser => {
-        if (!authedUser) {
-          console.log('Authentication failed during reconnect. Logging out.')
-          setUser(null) // This will trigger cleanup and stop retries
-          return
-        }
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      console.error('No token found for WebSocket connection')
+      setWsStatus('offline')
+      setUser(null) // No token, so we are not logged in.
+      return
+    }
 
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          console.error('No token found for WebSocket connection')
-          setWsStatus('offline')
-          return
-        }
+    console.log(`Attempting to connect (Attempt: ${reconnectAttempts.current})...`)
+    setWsStatus('connecting')
 
-        console.log(`Attempting to connect (Attempt: ${reconnectAttempts.current})...`)
-        setWsStatus('connecting')
+    const host =
+      process.env.NODE_ENV === 'production'
+        ? window.location.host
+        : 'localhost:8000'
 
-        const host =
-          process.env.NODE_ENV === 'production'
-            ? window.location.host
-            : 'localhost:8000'
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const newWs = new WebSocket(
+      `${wsProtocol}//${host}/ws/orders/?token=${token}`
+    )
 
-        const wsProtocol =
-          window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-        const newWs = new WebSocket(
-          `${wsProtocol}//${host}/ws/orders/?token=${token}`
+    newWs.onopen = () => {
+      console.log('WebSocket connected')
+      setWsStatus('online')
+      setError('') // Clear errors on successful connection
+      reconnectAttempts.current = 0 // Reset attempts on successful connection
+      getOrders().then(setOrders).catch(console.error)
+    }
+
+    newWs.onmessage = event => {
+      const data = JSON.parse(event.data)
+      if (data.type === 'order_status_update') {
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order.id === data.order_id
+              ? { ...order, status: data.status }
+              : order
+          )
         )
+      } else if (data.type === 'new_order' || data.type === 'send.order') {
+        setOrders(prevOrders => [data.order, ...prevOrders])
+      }
+    }
 
-        newWs.onopen = () => {
-          console.log('WebSocket connected')
-          setWsStatus('online')
-          setError('') // Clear errors on successful connection
-          reconnectAttempts.current = 0 // Reset attempts on successful connection
-          getOrders().then(setOrders).catch(console.error)
-        }
-
-        newWs.onmessage = event => {
-          const data = JSON.parse(event.data)
-          if (data.type === 'order_status_update') {
-            setOrders(prevOrders =>
-              prevOrders.map(order =>
-                order.id === data.order_id
-                  ? { ...order, status: data.status }
-                  : order
-              )
-            )
-          } else if (data.type === 'new_order' || data.type === 'send.order') {
-            setOrders(prevOrders => [data.order, ...prevOrders])
-          }
-        }
-
-        newWs.onclose = event => {
-          console.log('WebSocket disconnected')
-          setWsStatus('offline')
-          setError(prev => {
-            const msg = `[${new Date().toLocaleTimeString()}] Connection closed: Code ${event.code}, Reason: ${event.reason || 'No reason given'}`
-            return prev ? `${prev}\n${msg}` : msg
-          })
-
-          // Exponential backoff reconnect logic
-          const delay = Math.min(
-            1000 * 2 ** reconnectAttempts.current,
-            30000
-          ) // 1s, 2s, 4s, ..., max 30s
-          console.log(`Will attempt to reconnect in ${delay / 1000}s`)
-          reconnectAttempts.current++
-
-          if (reconnectTimeout.current) {
-            clearTimeout(reconnectTimeout.current)
-          }
-          reconnectTimeout.current = setTimeout(connect, delay)
-        }
-
-        newWs.onerror = (error) => {
-          console.error('WebSocket error')
-          setError(prev => {
-            const msg = `[${new Date().toLocaleTimeString()}] WebSocket error occurred: ${JSON.stringify(error)}`
-            return prev ? `${prev}\n${msg}` : msg
-          })
-          newWs.close() // This will trigger onclose and the reconnect logic
-        }
-
-        setWs(newWs)
+    newWs.onclose = event => {
+      console.log('WebSocket disconnected')
+      setWsStatus('offline')
+      setError(prev => {
+        const msg = `[${new Date().toLocaleTimeString()}] Connection closed: Code ${event.code}, Reason: ${event.reason || 'No reason given'}`
+        return prev ? `${prev}\n${msg}` : msg
       })
-      .catch(err => {
-        console.log('Authentication failed during reconnect with an error. Logging out.')
-        setError(prev => {
-          const msg = `[${new Date().toLocaleTimeString()}] Auth failed: ${err.message}`
-          return prev ? `${prev}\n${msg}` : msg
-        })
+
+      // Don't auto-reconnect on certain close codes (e.g., invalid token)
+      if (event.code === 4000 || event.code === 4001) {
+        console.log('Authentication error. Logging out.')
+        logout()
         setUser(null)
+        return
+      }
+
+      // Exponential backoff reconnect logic
+      const delay = Math.min(
+        1000 * 2 ** reconnectAttempts.current,
+        30000
+      ) // 1s, 2s, 4s, ..., max 30s
+      console.log(`Will attempt to reconnect in ${delay / 1000}s`)
+      reconnectAttempts.current++
+
+      if (reconnectTimeout.current) {
+        clearTimeout(reconnectTimeout.current)
+      }
+      reconnectTimeout.current = setTimeout(connect, delay)
+    }
+
+    newWs.onerror = error => {
+      console.error('WebSocket error')
+      setError(prev => {
+        const msg = `[${new Date().toLocaleTimeString()}] WebSocket error occurred.`
+        return prev ? `${prev}\n${msg}` : msg
       })
+      newWs.close() // This will trigger onclose and the reconnect logic
+    }
+
+    setWs(newWs)
   }, [])
 
   // Restore session via JWT on mount
@@ -186,6 +177,7 @@ export default function Dashboard() {
   // Effect to manage WebSocket connection based on user state
   useEffect(() => {
     if (user) {
+      console.log('User is logged in, establishing WebSocket connection...')
       connect()
     }
 
