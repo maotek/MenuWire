@@ -145,7 +145,7 @@ export default function Settings() {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1">{renderContent()}</main>
+        <div className="flex-1">{renderContent()}</div>
       </div>
     </div>
   )
