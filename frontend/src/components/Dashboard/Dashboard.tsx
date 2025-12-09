@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { logout, initAuth } from '@/app/lib/api'
+import { logout, initAuth, fetchCurrentUser } from '@/app/lib/api'
 import { Loader } from 'lucide-react'
 import Login from './Login'
 import OrderView from './OrderView'
@@ -66,18 +66,33 @@ export default function Dashboard() {
     })
   }, [orders])
 
-  
 
-  const connect = useCallback(() => {
+
+  const connect = useCallback(async () => {
+    try {
+      console.log('Refreshing token before connecting...')
+      await fetchCurrentUser() // Ensure token is fresh before connecting
+    } catch (err) {
+      console.error('Failed to refresh token, logging out.', err)
+      logout()
+      setUser(null)
+      return // Stop the connection attempt
+    }
+
     const token = localStorage.getItem('access_token')
     if (!token) {
       console.error('No token found for WebSocket connection')
       setWsStatus('offline')
+      logout()
       setUser(null) // No token, so we are not logged in.
       return
     }
 
     console.log(`Attempting to connect (Attempt: ${reconnectAttempts.current})...`)
+    setError(prev => {
+      const msg = `[${new Date().toLocaleTimeString()}] Connecting to server...`
+      return prev ? `${prev}\n${msg}` : msg
+    })
     setWsStatus('connecting')
 
     const host =
@@ -89,6 +104,11 @@ export default function Dashboard() {
     const newWs = new WebSocket(
       `${wsProtocol}//${host}/ws/orders/?token=${token}`
     )
+
+    setError(prev => {
+      const msg = `[${new Date().toLocaleTimeString()}] WebSocket connecting to ${wsProtocol}://${host}/ws/orders/`
+      return prev ? `${prev}\n${msg}` : msg
+    })
 
     newWs.onopen = () => {
       console.log('WebSocket connected')
@@ -134,7 +154,7 @@ export default function Dashboard() {
         30000
       ) // 1s, 2s, 4s, ..., max 30s
       console.log(`Will attempt to reconnect in ${delay / 1000}s`)
-        setError(prev => {
+      setError(prev => {
         const msg = `[${new Date().toLocaleTimeString()}] Reconnecting in ${delay / 1000}s...`
         return prev ? `${prev}\n${msg}` : msg
       })
@@ -205,6 +225,13 @@ export default function Dashboard() {
   const handleLogoutClick = () => {
     logout();
     setUser(null);
+    if (ws.current) {
+      console.log('Closing WebSocket due to logout.')
+      ws.current.onclose = null
+      ws.current.close()
+      ws.current = null
+      setWsStatus('offline')
+    }
   }
 
   const handleOrderStatusChange = (
