@@ -154,9 +154,10 @@ export default function DishBrowser({ dishData, code, table }: DishBrowserProps)
     className="
     relative w-full h-auto
     before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0
-    before:bg-[url('/assets/food5.png')]
+    before:bg-[url('/assets/bg-pattern.png')]
     before:bg-top before:bg-repeat
-    before:opacity-25 dark:before:opacity-10
+    before:opacity-100 dark:before:opacity-100
+    before:invert dark:before:invert-0
     before:-z-10
     before:bg-origin-border before:bg-clip-border
     "

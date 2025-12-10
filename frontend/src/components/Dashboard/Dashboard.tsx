@@ -9,6 +9,7 @@ import OrderView from './OrderView'
 import Settings from './Settings'
 import { Order, StringItem } from '@/app/lib/types'
 import DashboardNavbar from './DashboardNavbar'
+import { useToast } from '@/hooks/useToast'
 
 export interface CurrentUser {
   username: string
@@ -42,8 +43,9 @@ export default function Dashboard() {
   const [orders, setOrders] = useState<Order[]>([])
   const ws = useRef<WebSocket | null>(null)
   const [wsStatus, setWsStatus] = useState<'online' | 'offline' | 'connecting'>('connecting')
-  const reconnectAttempts = useRef(0)
+  const reconnectAttempts = useRef(1)
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null)
+  const { showToast, ToastComponent } = useToast()
 
   const [error, setError] = useState<string>('')
   const t = useTranslations('Dashboard')
@@ -106,7 +108,7 @@ export default function Dashboard() {
     )
 
     setError(prev => {
-      const msg = `[${new Date().toLocaleTimeString()}] WebSocket connecting to ${wsProtocol}://${host}/ws/orders/`
+      const msg = `[${new Date().toLocaleTimeString()}] WebSocket connecting to ${wsProtocol}//${host}/ws/orders/`
       return prev ? `${prev}\n${msg}` : msg
     })
 
@@ -114,6 +116,9 @@ export default function Dashboard() {
       console.log('WebSocket connected')
       setWsStatus('online')
       setError('') // Clear errors on successful connection
+      if (reconnectAttempts.current > 0) {
+        showToast(t('reconnected'))
+      }
       reconnectAttempts.current = 0 // Reset attempts on successful connection
     }
 
@@ -264,6 +269,7 @@ export default function Dashboard() {
 
     return (
       <div className="min-h-screen w-full bg-body-1">
+        <ToastComponent />
         <DashboardNavbar
           activeView={activeView}
           onSelectView={setActiveView}

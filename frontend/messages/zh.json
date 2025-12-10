@@ -11,7 +11,7 @@
     "totalPrice": "总价:",
     "orderNow": "立即下单",
     "ordering": "正在下单...",
-    "orderSuccess": "下单成功 (#{id}) — 总计 €{total}",
+    "orderSuccess": "下单成功 (共 {count} 件) — 总计 €{total}",
     "orderFailed": "下单失败: {message}"
   },
   "locales": {
@@ -66,12 +66,13 @@
     "markAsFinished": "标记为完成",
     "markAsPending": "标记为待处理",
     "connectingToServer": "正在连接到服务器...",
-    "reportIssue": "尝试刷新浏览器，或向管理员报告以下问题",
+    "reportIssue": "如果连接失败，请刷新浏览器并在问题仍然存在时报告问题。您可以复制下面的错误详细信息",
     "statusPlaced": "已下单",
     "statusFinished": "已完成",
     "statusCancelled": "已取消",
     "connectionLost": "连接已断开",
-    "attemptingReconnect": "正在尝试重新连接..."
+    "attemptingReconnect": "正在尝试重新连接...",
+    "reconnected": "已重新连接！"
   },
   "Common": {
     "learnMore": "了解更多",

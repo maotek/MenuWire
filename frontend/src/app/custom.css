@@ -33,3 +33,20 @@
 @media (prefers-reduced-motion: reduce) {
 	.fade-in, .scale-fade-in { animation: none; }
 }
+
+
+/* Custom Animation for Toast */
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.5s ease-out forwards;
+}

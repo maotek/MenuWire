@@ -11,7 +11,7 @@
     "totalPrice": "Totaalprijs:",
     "orderNow": "Bestel Nu",
     "ordering": "Bestellen...",
-    "orderSuccess": "Bestelling geplaatst (#{id}) — totaal €{total}",
+    "orderSuccess": "Bestelling geplaatst ({count} items) — totaal €{total}",
     "orderFailed": "Bestelling mislukt: {message}"
   },
   "locales": {

@@ -6,6 +6,7 @@ import { CartItem } from './DishBrowser';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { getLocalizedString } from '@/app/lib/utils';
+import { useToast } from '@/hooks/useToast';
 
 interface BasketProps {
     cart: CartItem[];
@@ -18,6 +19,8 @@ const Basket = ({ cart, setCart, code }: BasketProps) => {
     const [isOrdering, setOrdering] = useState(false);
     const locale = useLocale();
     const t = useTranslations('Order');
+
+    const { showToast, ToastComponent } = useToast();
 
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -87,10 +90,10 @@ const Basket = ({ cart, setCart, code }: BasketProps) => {
             // success: clear cart, close modal, show confirmation
             setCart([]);
             setOpen(false);
-            alert(t('orderSuccess', { default: `Order placed (#${data.id}) — total €${data.total}` }));
+            showToast(t('orderSuccess', { count: totalItems, total: totalCost, default: 'Your order has been placed successfully!' }), 3000);
         } catch (err: any) {
             console.error('Order error', err);
-            alert(t('orderFailed', { default: `Order failed: ${err.message || err}` }));
+            showToast(t('orderFailed', { message: err.message || err, default: 'Order failed: ' + (err.message || err) }), 3000);
         } finally {
             setOrdering(false);
         }
@@ -98,6 +101,9 @@ const Basket = ({ cart, setCart, code }: BasketProps) => {
 
     return (
         <>
+            <ToastComponent />
+
+            {/* Basket button */}
             <div className="fixed bottom-6 right-6 z-20 rounded-md p-2 backdrop-blur-xl bg-body-3/0.90 border-0 border-[rgb(var(--border-1))] shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
                 <button
                     onClick={() => setOpen((o) => !o)}

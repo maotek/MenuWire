@@ -20,6 +20,8 @@ import {
   ListPlus,
 } from 'lucide-react'
 
+import { useConfirm } from '@/hooks/useConfirm'
+
 // Mock data - in a real app, this would come from an API
 const mockData = {
   dishes: [
@@ -55,6 +57,8 @@ const entityConfig = {
 export default function Settings() {
   const t = useTranslations('Dashboard')
   const [activeView, setActiveView] = useState<EntityType>('dishes')
+
+  const { showConfirm, ConfirmComponent } = useConfirm()
 
   const NavItem = ({
     entity,
@@ -127,8 +131,11 @@ export default function Settings() {
 
   return (
     <div className="p-4 space-y-6">
+      <ConfirmComponent />
       <h2 className="text-2xl font-bold text-center">{t('restaurantSettings')}</h2>
       <div className="flex flex-col md:flex-row gap-6">
+        <button onClick={() => showConfirm("test", () => console.log("confirmed"))}>Test Confirm</button>
+
         {/* Sidebar Navigation */}
         <nav className="flex flex-row md:flex-col gap-2 w-full md:w-1/5 overflow-auto">
           {Object.keys(mockData).map(key => (

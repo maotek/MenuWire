@@ -70,10 +70,10 @@ export default function HomePage() {
 
   return (
     <main>
-      <div className="fixed left-0 top-0 w-dvw h-dvh bg-[url('/assets/landing-bg.png')] bg-center bg-cover z-0" />
+      <div className="fixed left-0 top-0 w-dvw h-dvh bg-[url('/assets/bg-pattern.png')] bg-repeat bg-center z-0" />
       <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(180deg,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.25)_35%,rgba(0,0,0,0.30)_100%)] z-[5]" />
-      <div className="ambient-blob ambient-blob-1 animate-float-medium z-[6] fixed" />
-      <div className="ambient-blob ambient-blob-2 ambient-blob-emph animate-float-strong z-[6]" />
+      {/* <div className="ambient-blob ambient-blob-1 animate-float-medium z-[6] fixed" /> */}
+      {/* <div className="ambient-blob ambient-blob-2 ambient-blob-emph animate-float-strong z-[6]" /> */}
 
 
       {/* ====== BRAND HEADER ====== */}
@@ -261,7 +261,7 @@ export default function HomePage() {
                 <h3 className="text-xl font-bold text-white text-center md:text-left">{c('regularPlanName')}</h3>
                 <p className="mt-1 text-gray-300 text-sm text-center md:text-left">{c('regularPlanDesc')}</p>
                 <div className="mt-4 text-center md:text-left">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-white">€8.99</span>
+                  <span className="text-3xl sm:text-4xl font-extrabold text-white">€9.99</span>
                   <span className="ml-2 text-gray-300 font-semibold align-middle">/ month</span>
                 </div>
 

@@ -11,7 +11,7 @@
     "totalPrice": "Total price:",
     "orderNow": "Order Now",
     "ordering": "Ordering...",
-    "orderSuccess": "Order placed (#{id}) — total €{total}",
+    "orderSuccess": "Order placed ({count} items) — total €{total}",
     "orderFailed": "Order failed: {message}"
   },
   "locales": {
@@ -65,12 +65,13 @@
     "addOption": "Add Option",
     "markAsFinished": "Mark as Finished",
     "connectingToServer": "Connecting to server...",
-    "reportIssue": "Try to refresh the browser, or report the following issue to the administrator",
+    "reportIssue": "If the connection fails, please refresh the browser and report the issue if it persists. You can copy the error details below",
     "statusPlaced": "Placed",
     "statusFinished": "Finished",
     "statusCancelled": "Cancelled",
     "connectionLost": "Connection lost",
-    "attemptingReconnect": "Attempting to reconnect..."
+    "attemptingReconnect": "Attempting to reconnect...",
+    "reconnected": "Reconnected!"
   },
   "Common": {
     "learnMore": "Learn more",
