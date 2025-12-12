@@ -47,6 +47,44 @@
   }
 }
 
+@keyframes fade-out-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 .animate-fade-in-down {
   animation: fade-in-down 0.5s ease-out forwards;
+}
+
+.animate-fade-out-up {
+  animation: fade-out-up 0.5s ease-out forwards;
+}
+
+
+/* Scroll-driven animation for the navbar */
+@keyframes scroll-header-bg {
+  from {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(12px);
+  }
+}
+
+.scroll-header {
+  animation: scroll-header-bg linear both;
+  animation-timeline: scroll();
+  animation-range: 0px 50px;
 }

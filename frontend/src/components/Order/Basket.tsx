@@ -101,6 +101,7 @@ const Basket = ({ cart, setCart, code }: BasketProps) => {
 
     return (
         <>
+            {/* <div className="fixed -z-[6] inset-0 pointer-events-none bg-[linear-gradient(180deg,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.25)_35%,rgba(0,0,0,0.30)_100%)]" /> */}
             <ToastComponent />
 
             {/* Basket button */}
@@ -138,8 +139,8 @@ const Basket = ({ cart, setCart, code }: BasketProps) => {
                 <div
                     className={`
                         scale-fade-in
-                        border-0 border-[rgb(var(--border-1))]
-                        bg-body-1
+                        border-0 border-[rgb(var(--border-1))] bg-[linear-gradient(180deg,rgba(0,0,0,0.20)_0%,rgba(0,0,0,0.25)_35%,rgba(0,0,0,0.30)_100%)]
+                        bg-body-3
                         rounded-lg shadow-lg 
                         w-80 h-[85vh] 
                         flex flex-col text-heading-1

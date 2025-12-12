@@ -1,7 +1,7 @@
 {
   "Order": {
-    "browserTitle": "MAOTEK - ZH",
-    "title": "MAOTEK",
+    "browserTitle": "MenuWire - 轻松点餐",
+    "title": "MenuWire",
     "all": "全部",
     "addToBasket": "加入购物篮",
     "close": "关闭",
@@ -77,7 +77,7 @@
   "Common": {
     "learnMore": "了解更多",
     "signUp": "注册",
-    "preview": "快速预览",
+    "preview": "功能",
     "scanOrderTitle": "扫码点餐",
     "scanOrderDesc": "顾客扫码即可用手机下单。",
     "simpleDashboardTitle": "简洁面板",
@@ -90,12 +90,12 @@
     "tagline": "快速 · 简单 · 本地",
     "testimonial": "\"已在数十家咖啡馆使用 — 排队减少了一半。\"",
     "testimonialAuthor": "— 当地咖啡馆老板",
-    "brandName": "MaoTek AliExpress",
+    "brandName": "MenuWire",
     "emailLabel": "邮箱",
     "emailPlaceholder": "you@example.com",
     "emailSubmit": "留下您的邮箱",
     "trustedByHospitality": "受到现代餐饮业信赖",
-    "pricingTitle": "简单透明的定价",
+    "pricingTitle": "定价",
     "pricingSubtitle": "从小开始，随时扩展。可随时取消。",
     "regularPlanName": "常规版",
     "regularPlanDesc": "运行二维码点餐所需的一切。",

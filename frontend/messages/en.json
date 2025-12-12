@@ -1,7 +1,7 @@
 {
   "Order": {
-    "browserTitle": "MAOTEK - EN",
-    "title": "MAOTEK",
+    "browserTitle": "MenuWire - Easy ordering",
+    "title": "MenuWire",
     "all": "All",
     "addToBasket": "Add to basket",
     "close": "Close",
@@ -76,7 +76,7 @@
   "Common": {
     "learnMore": "Learn more",
     "signUp": "Sign up",
-    "preview": "Quick Preview",
+    "preview": "Features",
     "scanOrderTitle": "Scan & Order",
     "scanOrderDesc": "Customers scan QR and order instantly from phone.",
     "simpleDashboardTitle": "Simple Dashboard",
@@ -89,12 +89,12 @@
     "tagline": "Fast. Simple. Local.",
     "testimonial": "\"Used in dozens of cafés — our queues halved.\"",
     "testimonialAuthor": "— Local café owner",
-    "brandName": "MaoTek AliExpress",
+    "brandName": "MenuWire",
     "emailLabel": "Email",
     "emailPlaceholder": "you@example.com",
     "emailSubmit": "Leave your email",
     "trustedByHospitality": "Trusted by modern hospitality",
-    "pricingTitle": "Simple, transparent pricing",
+    "pricingTitle": "Pricing",
     "pricingSubtitle": "Start small and scale when you’re ready. Cancel anytime.",
     "regularPlanName": "Regular",
     "regularPlanDesc": "Everything you need to run QR orders.",

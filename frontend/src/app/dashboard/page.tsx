@@ -17,7 +17,7 @@ export default async function Page() {
   return (
     <>
       {/* <OrderNavbar name={t('title')} /> */}
-      <main className="flex flex-col bg-body-3 text-heading-1 h-screen">
+      <main className="flex flex-col text-heading-1 h-screen">
         <div className="h-full">
           <Dashboard />
         </div>

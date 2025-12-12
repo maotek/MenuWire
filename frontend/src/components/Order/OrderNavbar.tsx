@@ -15,8 +15,8 @@ interface OrderNavbarProps {
 
 const OrderNavbar = ({ table_number, logo_url, name }: OrderNavbarProps) => {
     return (
-        <header className="flex w-full px-4 py-2 h-14 z-50 backdrop-blur-md bg-body-1">
-            <nav className='flex flex-1 flex-row justify-between'>
+        <nav className="flex w-full px-4 py-2 h-14 z-50 ">
+            <div className='flex flex-1 flex-row justify-between'>
                 <div className='flex items-center'>
                     <Link href="/" className="flex flex-row items-center pr-3">
                         <Image className="h-[38] w-auto rounded"
@@ -45,8 +45,8 @@ const OrderNavbar = ({ table_number, logo_url, name }: OrderNavbarProps) => {
                 <div className='flex items-center'>
                     <Options supportedLocales={locales} />
                 </div>
-            </nav>
-        </header>
+            </div>
+        </nav>
     )
 }
 

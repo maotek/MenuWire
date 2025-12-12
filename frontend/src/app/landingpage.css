@@ -25,10 +25,10 @@
   right: -12%;
   background: radial-gradient(600px circle at 60% 60%, rgba(52,211,153,0.3), transparent 65%);
 }
-.dark .ambient-blob-1 {
+[data-theme='dark'] .ambient-blob-1 {
   background: radial-gradient(600px circle at 40% 40%, rgba(255,140,66,0.25), transparent 65%);
 }
-.dark .ambient-blob-2 {
+[data-theme='dark'] .ambient-blob-2 {
   background: radial-gradient(600px circle at 60% 60%, rgba(52,211,153,0.22), transparent 65%);
 }
 
@@ -50,17 +50,18 @@
 .glass-card {
   background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(255, 255, 255, 0.06)
+      rgba(0, 0, 0, 0.06),
+      rgba(0, 0, 0, 0.02)
     );
   border: 1px solid rgba(255,255,255,0.12);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(2px);
 }
-.dark .glass-card {
+
+[data-theme='dark'] .glass-card {
   background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.28),
-      rgba(0, 0, 0, 0.22)
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.02)
     );
   border-color: rgba(255,255,255,0.08);
 }

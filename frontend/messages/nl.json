@@ -1,7 +1,7 @@
 {
   "Order": {
-    "browserTitle": "MAOTEK - NL",
-    "title": "MAOTEK",
+    "browserTitle": "MenuWire - Eenvoudig bestellen",
+    "title": "MenuWire",
     "all": "Alles",
     "addToBasket": "Toevoegen aan winkelmand",
     "close": "Sluiten",
@@ -76,7 +76,7 @@
   "Common": {
     "learnMore": "Meer informatie",
     "signUp": "Aanmelden",
-    "preview": "Snelle preview",
+    "preview": "Functies",
     "scanOrderTitle": "Scan & bestel",
     "scanOrderDesc": "Klanten scannen een QR en bestellen direct vanaf hun telefoon.",
     "simpleDashboardTitle": "Eenvoudig dashboard",
@@ -89,12 +89,12 @@
     "tagline": "Snel. Simpel. Lokaal.",
     "testimonial": "\"Gebruikt in tientallen cafés — onze wachtrijen halveerden.\"",
     "testimonialAuthor": "— Lokale café-eigenaar",
-    "brandName": "MaoTek AliExpress",
+    "brandName": "MenuWire",
     "emailLabel": "E-mail",
     "emailPlaceholder": "jij@voorbeeld.com",
     "emailSubmit": "Laat je e-mail achter",
     "trustedByHospitality": "Vertrouwd door moderne horeca",
-    "pricingTitle": "Eenvoudige, transparante prijzen",
+    "pricingTitle": "Prijzen",
     "pricingSubtitle": "Begin klein en schaal wanneer je klaar bent. Altijd opzegbaar.",
     "regularPlanName": "Standaard",
     "regularPlanDesc": "Alles wat je nodig hebt voor QR-bestellingen.",
