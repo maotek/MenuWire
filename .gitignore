@@ -1,1 +1,7 @@
 .env
+
+/media
+/db
+/static
+/certbot_etc
+/certbot_web

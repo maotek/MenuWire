@@ -5,8 +5,10 @@ from django.db.models.signals import post_migrate
 class RestaurantsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'restaurants'
+    default = True
 
     def ready(self):
+        print("RestaurantsConfig.ready() called")
         # Delay import until app registry is ready
         from django.contrib.auth import get_user_model
 
