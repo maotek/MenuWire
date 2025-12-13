@@ -13,6 +13,7 @@ class RestaurantsConfig(AppConfig):
         User = get_user_model()
 
         def create_default_superuser(sender, **kwargs):
+            print("post_migrate fired, sender =", getattr(sender, "name", sender))
             if not User.objects.filter(username="admin").exists():
                 print("Creating default superuser 'admin' / '123456'")
                 User.objects.create_superuser(

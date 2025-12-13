@@ -13,9 +13,9 @@ services:
     env_file:
       - ./.env # IMPORTANT: In a real production environment, manage secrets securely (e.g., with Docker secrets or a cloud provider's secret manager) instead of using a .env file.
     volumes:
-      - ./backend/media:/app/media # Persist user-uploaded media files
+      - ./media:/app/media # Persist user-uploaded media files
       - backend_static:/app/static # Volume for collected static files
-      - ./backend/db:/app/db # Persist the SQLite database
+      - ./db:/app/db # Persist the SQLite database
     restart: unless-stopped
 
   frontend:
@@ -36,7 +36,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./backend/media:/app/media:ro # Serve media files read-only
+      - ./media:/app/media:ro # Serve media files read-only
       - backend_static:/app/static:ro # Serve static files read-only
     restart: unless-stopped
 
