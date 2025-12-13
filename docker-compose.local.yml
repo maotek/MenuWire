@@ -3,7 +3,7 @@
 # This configuration always pulls the 'latest' tag.
 #
 # Example usage:
-# docker-compose -f docker-compose.prod.yml up -d
+# docker-compose -f docker-compose.local.yml up -d
 
 services:
   backend:
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   nginx:
-    image: ghcr.io/maotek/menuwire-nginx:latest
+    image: nginx:alpine
     container_name: menuwire-nginx-prod
     depends_on:
       - backend
@@ -38,6 +38,7 @@ services:
     volumes:
       - ./media:/app/media:ro # Serve media files read-only
       - backend_static:/app/static:ro # Serve static files read-only
+      - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
     restart: unless-stopped
 
 volumes:
