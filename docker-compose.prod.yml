@@ -15,6 +15,7 @@ services:
     volumes:
       - ./backend/media:/app/media # Persist user-uploaded media files
       - backend_static:/app/static # Volume for collected static files
+      - ./backend/db:/app/db # Persist the SQLite database
     restart: unless-stopped
 
   frontend:

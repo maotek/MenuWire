@@ -229,7 +229,7 @@ export default function HomePage() {
             </div>
             <div className="glass-card rounded-md p-3 border border-white/10 hover:border-white/30 transition-colors text-center flex flex-col items-center">
               <div className="relative w-full aspect-[4/3] mb-4 rounded-md overflow-hidden bg-white/5">
-                 <Image src="/assets/fast.png" alt={c('fastSetup')} fill className="object-cover" />
+                 <Image src="/assets/contactless.png" alt={c('fastSetup')} fill className="object-cover" />
               </div>
               <Zap className="w-6 h-6 mx-auto mb-2 text-orange-400" aria-hidden />
               <p className="text-sm font-semibold">{c('fastSetup')}</p>
