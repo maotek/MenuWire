@@ -1,0 +1,39 @@
+# Run in production with nginx and certbot
+# sudo docker compose -f docker-compose.app.yml -f docker-compose.public.yml up -d
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: menuwire-nginx
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./media:/app/media:ro
+      - backend_static:/app/static:ro
+      - ./nginx/nginx.public.conf:/etc/nginx/nginx.conf:ro
+      - certbot_etc:/etc/letsencrypt
+      - certbot_web:/var/www/certbot
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    container_name: menuwire-certbot
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_web:/var/www/certbot
+    restart: unless-stopped
+    entrypoint: /bin/sh -c
+    command: >
+      "trap exit TERM;
+       while :; do
+         certbot renew --webroot -w /var/www/certbot --quiet;
+         sleep 12h;
+       done"
+
+volumes:
+  certbot_etc:
+  certbot_web:

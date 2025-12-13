@@ -72,22 +72,3 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           tags: ${{ steps.meta-frontend.outputs.tags }}
           labels: ${{ steps.meta-frontend.outputs.labels }}
-
-      # ---------- NGINX ----------
-      - name: Extract metadata for nginx image
-        id: meta-nginx
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/menuwire-nginx
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=tag
-
-      - name: Build and push nginx image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./nginx
-          push: true
-          platforms: linux/amd64,linux/arm64/v8
-          tags: ${{ steps.meta-nginx.outputs.tags }}
-          labels: ${{ steps.meta-nginx.outputs.labels }}
