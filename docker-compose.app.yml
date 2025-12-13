@@ -1,0 +1,24 @@
+services:
+  backend:
+    image: ghcr.io/maotek/menuwire-backend:latest
+    container_name: menuwire-backend
+    env_file:
+      - ./.env
+    volumes:
+      - ./media:/app/media
+      - ./db:/app/db
+      - backend_static:/app/static
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/maotek/menuwire-frontend:latest
+    container_name: menuwire-frontend
+    env_file:
+      - ./.env
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend_static:
+  

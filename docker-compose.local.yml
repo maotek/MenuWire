@@ -1,47 +1,14 @@
-# This file is for production deployments. It uses pre-built images from GHCR.
-# To use it, you must first push images using the GitHub Actions workflow.
-# This configuration always pulls the 'latest' tag.
-#
-# Example usage:
-# docker-compose -f docker-compose.local.yml up -d
-
 services:
-  backend:
-    # The 'build' context is removed, as we are using a pre-built image.
-    image: ghcr.io/maotek/menuwire-backend:latest
-    container_name: menuwire-backend-prod
-    env_file:
-      - ./.env # IMPORTANT: In a real production environment, manage secrets securely (e.g., with Docker secrets or a cloud provider's secret manager) instead of using a .env file.
-    volumes:
-      - ./media:/app/media # Persist user-uploaded media files
-      - backend_static:/app/static # Volume for collected static files
-      - ./db:/app/db # Persist the SQLite database
-    restart: unless-stopped
-
-  frontend:
-    image: ghcr.io/maotek/menuwire-frontend:latest
-    container_name: menuwire-frontend-prod
-    env_file:
-      - ./.env
-    depends_on:
-      - backend
-    restart: unless-stopped
-
   nginx:
     image: nginx:alpine
-    container_name: menuwire-nginx-prod
+    container_name: menuwire-nginx
     depends_on:
       - backend
       - frontend
     ports:
       - "80:80"
     volumes:
-      - ./media:/app/media:ro # Serve media files read-only
-      - backend_static:/app/static:ro # Serve static files read-only
+      - ./media:/app/media:ro
+      - backend_static:/app/static:ro
       - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
     restart: unless-stopped
-
-volumes:
-  backend_static:
-    # This volume is managed by Docker and persists between container restarts.
-    # The backend service writes to it, and the nginx service reads from it.
